@@ -36,14 +36,14 @@ router.post('/write', function(req, res, next) {
 		//关键字段
 		var url = req.param('url') || '';
 		var title = req.param('title') || '';
-		var image = req.param('image') || '';
-		if (!type || !url || !title || !image) {
+		var img = req.param('img') || '';
+		if (!type || !url || !title || !img) {
 			return res.send({
 				status: 0,
 				info: "提交的字段不全"
 			});
 		}
-		console.log("****" + url + title + image)
+		console.log("****" + url + title + img)
 		var filePath = PATH + type + '.json';
 		//1)需要拿到文件的信息
 		fs.readFile(filePath, function(error, data) {
@@ -57,7 +57,7 @@ router.post('/write', function(req, res, next) {
 			//代表每一条记录
 			var obj = {
 				url: url,
-				image: image,
+				img: img,
 				title: title,
 				id: guidGenerate(),
 				time: new Date()

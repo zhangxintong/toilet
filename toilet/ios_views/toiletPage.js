@@ -8,7 +8,7 @@ import {
 	WebView
 } from 'react-native';
 import TWebView from './twebview';
-const nearByURL = './../html/nearby.html';
+const nearByURL = 'http://localhost:4000/nearby.html';
 export default class toiletPage extends Component {
 	render() {
 		return (
