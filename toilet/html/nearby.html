@@ -42,6 +42,9 @@
 		margin-left: 52px;
 		margin-bottom: 20px;
 	}
+	.amap-scale-text {
+	    margin-left: 52px;
+	}
 	.makerStyle{background-color:#FF4814;font-size:12px;color:#fff;
         -webkit-border-radius: 2px;
         -moz-border-radius: 2px;
@@ -95,8 +98,11 @@
 <body>
 	<div id="container"></div> 
 	<script type="text/javascript">
+	    var isiPhone = navigator.userAgent.toLocaleLowerCase().match(/iPhone/i);//判断是不是苹果手机
+	    var walking = null;
 		var map = new AMap.Map('container', {
-	      zoom: 10
+	      resizeEnable: true,
+	      zoom: 13
 	    });
 		var locationIcon = '<div class="locationIcon"><image  src="./geolocation.png">'
 		+'</div>'
@@ -138,6 +144,14 @@
 			var scale = new AMap.Scale(); 
 			map.addControl(scale); 
 		});
+		AMap.service('AMap.Walking', function(){
+	      walking= new AMap.Walking({
+	        map: map
+	      });
+	    });
+		function _closeInfoWindow(){
+	      map.clearInfoWindow();
+	    }
 		//TODO
 		//1)点击marker展示一个详细信息的window
 		//2)点击marker 路线规划和导航
@@ -146,7 +160,7 @@
 				var pos = data.position;
 					//展示定位
 			      var marker = new AMap.Marker({
-			        position: center,
+			        position: pos,
 			        map: map,
 			        content:'<div class="loc_circle"></div><img class="loc_img" src="loc.png" style="width:16px;"/>'
 			      });
@@ -157,9 +171,55 @@
 			            extensions:'base',
 			            type:'200300|200301|200302|200303'
 			        });
-			      	placeSearch.searchNearBy('卫生间',pos,2000,function(status,result){
+			      	placeSearch.searchNearBy('卫生间',pos,3000,function(status,result){
 			      		if(result.info === "OK" && status === "complete"){
 			      			var pois = result.poiList.pois;
+
+			      			pois.forEach(function(poi){
+				                var divStr = '<div class="makerStyle">' + poi.distance + '米</div>';
+				                var info = '<div class="infoWindow"><div class="info_title">卫生间</div>'
+				                    + '<div class="info_name">名称: ' + poi.name+ '</div>'
+				                    + '<div class="info_dis">距您: ' + '<span class="dis_span">' + poi.distance + '米</span>' + '</div>'
+				                    + '<div class="info_address">地址: ' + poi.address+ '</div>'
+				                    + '<div class="info_type">类型: ' + (poi.type || '卫生间')+ '</div>'
+				                    + '<div class="info_arrow"></div>';
+
+				                if(isiPhone && isiPhone.length){
+					                info +='<div class="info_close" ontouchstart="_closeInfoWindow()"><img src="close_blue.png" style=""/></div>'
+					                  + '</div>';
+				                }else{
+					                info += '<div class="info_close" onclick="_closeInfoWindow()"><img src="close_blue.png" style=""/></div>'
+					                + '</div>';
+					              }
+					              var marker = new AMap.Marker({
+					                position: poi.location,
+					                title: poi['name'],
+					                map: map,
+					                content: divStr,
+					                offset: new AMap.Pixel(10,-25)
+					              });
+					              function showInfo(){
+					                var infowindow = new AMap.InfoWindow({
+					                  content: info,
+					                  offset: new AMap.Pixel(40,-35),
+					                  isCustom: true
+					                });
+					                 infowindow.open(map, poi.location);
+					                //步行路径规划
+					                walking.clear();
+					                var start = pos;
+					                var end = poi.location;
+					                walking.search(start, end);
+					              }
+
+					              if(isiPhone && isiPhone.length){
+					                AMap.event.addListener(marker, 'touchstart', showInfo);
+					              }else{
+					                AMap.event.addListener(marker, 'click', showInfo);
+					              }
+				          });
+						  map.setZoom(13);
+
 			      		}else{
 			      			alert("没有相关数据");
 			      		}
@@ -173,6 +233,9 @@
 				alert("调用地图服务错误，或者没有数据")
 			}
 		}
+		document.querySelector('a.amap-logo').onclick = function(){
+	      return false;
+	    };
 	</script>
 </body>
 </html>
