@@ -65,5 +65,11 @@ router.get('/edit', function(req, res, next) {
 		});
 	}
 });
+router.get('/tuijian', function(req, res, next) {
+	if (!req.session.user) {
+		return res.render('login', {});
+	}
+	res.render('tuijian', {});
+});
 
 module.exports = router;

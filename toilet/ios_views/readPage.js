@@ -5,7 +5,8 @@ import {
 	StyleSheet,
 	Text,
 	View,
-	ScrollView
+	ScrollView,
+	NavigatorIOS
 } from 'react-native';
 
 import Category from './read/category';
@@ -29,27 +30,49 @@ export default class readPage extends Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			isShow: false
+			isShow: false,
+			recommendTopic: null,
+			hotTopic: null,
+			category: null,
+			other: null
 		}
 	}
 	componentDidMount() {
-		//Util.get();
-		this.setState({
-			isShow: true
-		})
+		var that = this;
+		Util.get('http://123.57.39.116:3000/data/read?type=config', function(data) {
+			if (data.status === 1) {
+				let obj = data.data;
+
+				that.setState({
+					isShow: true,
+					recommendTopic: obj.recommendTopic,
+					hotTopic: obj.hotTopic,
+					category: obj.category,
+					other: obj.other
+				})
+			} else {
+				console.log("----data.status---", data.status)
+			}
+		}, function(error) {
+			console.log("---error---", error)
+		});
+
 	}
 	render() {
 		return (
-			<View>
+			<View style={styles.container}>
 				<Search />
 				<Hr />
 				{
 					this.state.isShow?
-					<ScrollView>
-						<Topic /> 
-						< Recommend / >
-						<Category />
-						<Recommend />
+					<ScrollView style={[styles.container,{paddingTop:4}]}> 
+						<Topic data={this.state.recommendTopic}/> 
+						<Hr/>
+						< Recommend name="热门推荐" data={this.state.hotTopic}/ >
+						<Hr/>
+						<Category data={this.state.category} />
+						<Hr/>
+						<Recommend name="清新一刻" data={this.state.other} />
 					</ScrollView>
 					:null				
 				}
@@ -58,10 +81,16 @@ export default class readPage extends Component {
 		)
 	}
 }
-
+class read extends Component {
+	render() {
+		return (
+			<NavigatorIOS initialRoute = {{component: readPage,title: '阅读',navigationBarHidden:true}} style = {{flex: 1}}/>
+		);
+	}
+}
 var styles = StyleSheet.create({
-	text: {
-		fontSize: 20
+	container: {
+		flex: 1
 	},
 	hr: {
 		marginTop: 10,
