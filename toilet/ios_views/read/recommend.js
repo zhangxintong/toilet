@@ -22,20 +22,20 @@ class recommend extends Component {
 						<View>
 							<Text style={[styles.text1,styles.title_top]}>{this.state.name}</Text>
 						</View>
-						
-							{
+						<View style={styles.img_view}>
+							{	
 								this.state.data.map((item,index)=>{
 									return(
-											{(index/4)===0?true:false}
-											<Text key={index} style={{color:"red"}}>{(index/4)===0?true:false} </Text>
+											<View key={index} style={[styles.img_item]}>
+												<Image style={[styles.img,styles.shadow]} source={{uri:item.img}}/>
+												<Text style={styles.title} numberOfLines={2}>{item.title}</Text>
+											</View>
 										 )
 								})
 							}
+						</View>
 						<View style={styles.img_view}>
-							<View style={[styles.img_item]}>
-								<Image style={[styles.img,styles.shadow]} source={{uri:'http://7xtp9h.com2.z0.glb.clouddn.com/1.png'}}/>
-								<Text style={styles.title} numberOfLines={2}>标题</Text>
-							</View>
+							
 							<View style={[styles.img_item]}>
 								<Image style={[styles.img,styles.shadow]} source={{uri:'http://7xtp9h.com2.z0.glb.clouddn.com/1.png'}}/>
 								<Text style={styles.title} numberOfLines={2}>标题</Text>
